@@ -103,6 +103,7 @@ static inline MM cmul_ps(MM a, MM b)
 void MANGLE(mufft_convolve)(cfloat * MUFFT_RESTRICT output, const cfloat * MUFFT_RESTRICT input_a, const cfloat * MUFFT_RESTRICT input_b,
         float normalization, unsigned samples)
 {
+    printf("mufft_convolve \n");
     const MM n = splat_const_complex(normalization, normalization);
     for (unsigned i = 0; i < samples; i += VSIZE)
     {
@@ -116,6 +117,7 @@ void MANGLE(mufft_convolve)(cfloat * MUFFT_RESTRICT output, const cfloat * MUFFT
 void MANGLE(mufft_resolve_c2r)(cfloat * MUFFT_RESTRICT output, const cfloat * MUFFT_RESTRICT input,
         const cfloat * MUFFT_RESTRICT twiddles, unsigned samples)
 {
+    printf("mufft_resolve_c2r \n");
     const MM flip_signs = splat_const_complex(0.0f, -0.0f);
     for (unsigned i = 0; i < samples; i += VSIZE)
     {
@@ -134,6 +136,7 @@ void MANGLE(mufft_resolve_c2r)(cfloat * MUFFT_RESTRICT output, const cfloat * MU
 void MANGLE(mufft_resolve_r2c_full)(cfloat * MUFFT_RESTRICT output, const cfloat * MUFFT_RESTRICT input,
         const cfloat * MUFFT_RESTRICT twiddles, unsigned samples)
 {
+    printf("mufft_resolve_r2c_full \n");
     cfloat fe = crealf(input[0]);
     cfloat fo = cimagf(input[0]);
     output[0] = fe + fo;
@@ -168,6 +171,7 @@ void MANGLE(mufft_resolve_r2c_full)(cfloat * MUFFT_RESTRICT output, const cfloat
 void MANGLE(mufft_resolve_r2c)(cfloat * MUFFT_RESTRICT output, const cfloat * MUFFT_RESTRICT input,
         const cfloat * MUFFT_RESTRICT twiddles, unsigned samples)
 {
+    printf("mufft_resolve_r2c \n");
     cfloat fe = crealf(input[0]);
     cfloat fo = cimagf(input[0]);
     output[0] = fe + fo;
@@ -200,6 +204,7 @@ void MANGLE(mufft_resolve_r2c)(cfloat * MUFFT_RESTRICT output, const cfloat * MU
 void MANGLE(mufft_radix2_p1)(void * MUFFT_RESTRICT output_, const void * MUFFT_RESTRICT input_,
         const cfloat * MUFFT_RESTRICT twiddles, unsigned p, unsigned samples)
 {
+    printf("mufft_radix2_p1 \n");
     cfloat *output = output_;
     const cfloat *input = input_;
     (void)twiddles;
@@ -232,6 +237,7 @@ void MANGLE(mufft_radix2_p1)(void * MUFFT_RESTRICT output_, const void * MUFFT_R
 void MANGLE(mufft_radix2_half_p1)(void * MUFFT_RESTRICT output_, const void * MUFFT_RESTRICT input_,
         const cfloat * MUFFT_RESTRICT twiddles, unsigned p, unsigned samples)
 {
+    printf("mufft_radix2_half_p1 \n");
     cfloat *output = output_;
     const cfloat *input = input_;
     (void)twiddles;
@@ -262,10 +268,12 @@ void MANGLE(mufft_radix2_half_p1)(void * MUFFT_RESTRICT output_, const void * MU
 
 #if VSIZE == 4
 #define RADIX2_P2_END \
+    printf("radix_p2_end 1 \n");\
     a = _mm256_permute2f128_ps(r0, r1, (2 << 4) | (0 << 0)); \
     b = _mm256_permute2f128_ps(r0, r1, (3 << 4) | (1 << 0))
 #else
 #define RADIX2_P2_END \
+    printf("radix_p2_end_2 \n");\
     a = r0; \
     b = r1
 #endif
@@ -274,6 +282,7 @@ void MANGLE(mufft_radix2_half_p1)(void * MUFFT_RESTRICT output_, const void * MU
 void MANGLE(mufft_ ## direction ## _radix2_p2)(void * MUFFT_RESTRICT output_, const void * MUFFT_RESTRICT input_, \
         const cfloat * MUFFT_RESTRICT twiddles, unsigned p, unsigned samples) \
 { \
+    printf("mufft_ _radix2_p2 \n");\
     cfloat *output = output_; \
     const cfloat *input = input_; \
     (void)twiddles; \
@@ -303,6 +312,7 @@ RADIX2_P2(inverse, -0.0f, 0.0f)
 void MANGLE(mufft_radix2_generic)(void * MUFFT_RESTRICT output_, const void * MUFFT_RESTRICT input_,
         const cfloat * MUFFT_RESTRICT twiddles, unsigned p, unsigned samples)
 {
+    printf("mufft_radix2_generic \n");
     cfloat *output = output_;
     const cfloat *input = input_;
 
@@ -344,6 +354,7 @@ void MANGLE(mufft_radix2_generic)(void * MUFFT_RESTRICT output_, const void * MU
 void MANGLE(mufft_ ## direction ## _radix4_p1)(void * MUFFT_RESTRICT output_, const void * MUFFT_RESTRICT input_, \
         const cfloat * MUFFT_RESTRICT twiddles, unsigned p, unsigned samples) \
 { \
+    printf("mufft_ _radix4_p1 \n");\
     cfloat *output = output_; \
     const cfloat *input = input_; \
     (void)twiddles; \
@@ -378,6 +389,7 @@ void MANGLE(mufft_ ## direction ## _radix4_p1)(void * MUFFT_RESTRICT output_, co
 
 #undef RADIX4_LOAD_FIRST_BUTTERFLY
 #define RADIX4_LOAD_FIRST_BUTTERFLY \
+        printf("radix4_load_first_butterfly 1 \n");\
         MM a = load_ps(&input[i]); \
         MM b = load_ps(&input[i + quarter_samples]); \
         MM c = load_ps(&input[i + 2 * quarter_samples]); \
@@ -391,6 +403,7 @@ RADIX4_P1(forward, 0.0f, -0.0f)
 RADIX4_P1(inverse, -0.0f, 0.0f)
 #undef RADIX4_LOAD_FIRST_BUTTERFLY
 #define RADIX4_LOAD_FIRST_BUTTERFLY \
+        printf("radix4_load_first_butterfly 2 \n");\
         MM a = load_ps(&input[i]); \
         MM b = load_ps(&input[i + quarter_samples]); \
  \
@@ -403,6 +416,7 @@ RADIX4_P1(forward_half, 0.0f, -0.0f)
 void MANGLE(mufft_radix4_generic)(void * MUFFT_RESTRICT output_, const void * MUFFT_RESTRICT input_,
         const cfloat * MUFFT_RESTRICT twiddles, unsigned p, unsigned samples)
 {
+    printf("mufft_radix4_generic \n");
     cfloat *output = output_;
     const cfloat *input = input_;
 
@@ -447,6 +461,7 @@ void MANGLE(mufft_radix4_generic)(void * MUFFT_RESTRICT output_, const void * MU
 
 #if VSIZE == 4
 #define RADIX8_P1_END \
+        printf("radix8_p1_end 1 \n");\
         o0 = _mm256_permute2f128_ps(o0o1_lo, o2o3_lo, (2 << 4) | (0 << 0)); \
         o1 = _mm256_permute2f128_ps(o4o5_lo, o6o7_lo, (2 << 4) | (0 << 0)); \
         o2 = _mm256_permute2f128_ps(o0o1_hi, o2o3_hi, (2 << 4) | (0 << 0)); \
@@ -457,6 +472,7 @@ void MANGLE(mufft_radix4_generic)(void * MUFFT_RESTRICT output_, const void * MU
         o7 = _mm256_permute2f128_ps(o4o5_hi, o6o7_hi, (3 << 4) | (1 << 0))
 #else
 #define RADIX8_P1_END \
+        printf("radix8_p1_end 2 \n");\
         o0 = o0o1_lo; \
         o1 = o2o3_lo; \
         o2 = o4o5_lo; \
@@ -471,6 +487,7 @@ void MANGLE(mufft_radix4_generic)(void * MUFFT_RESTRICT output_, const void * MU
 void MANGLE(mufft_ ## direction ## _radix8_p1)(void * MUFFT_RESTRICT output_, const void * MUFFT_RESTRICT input_, \
         const cfloat * MUFFT_RESTRICT twiddles, unsigned p, unsigned samples) \
 { \
+    printf("mufft_ _radix8_p1 \n");\
     cfloat *output = output_; \
     const cfloat *input = input_; \
     (void)twiddles; \
@@ -533,6 +550,7 @@ void MANGLE(mufft_ ## direction ## _radix8_p1)(void * MUFFT_RESTRICT output_, co
 
 #undef RADIX8_LOAD_FIRST_BUTTERFLY
 #define RADIX8_LOAD_FIRST_BUTTERFLY \
+        printf("radix8_load_first_butterfly 1 \n");\
         MM a = load_ps(&input[i]); \
         MM b = load_ps(&input[i + octa_samples]); \
         MM c = load_ps(&input[i + 2 * octa_samples]); \
@@ -554,6 +572,7 @@ RADIX8_P1(forward, 0.0f, -0.0f, -M_SQRT1_2)
 RADIX8_P1(inverse, -0.0f, +0.0f, +M_SQRT1_2)
 #undef RADIX8_LOAD_FIRST_BUTTERFLY
 #define RADIX8_LOAD_FIRST_BUTTERFLY \
+        printf("radix8_load_first_butterfly 2 \n");\
         MM a = load_ps(&input[i]); \
         MM b = load_ps(&input[i + octa_samples]); \
         MM c = load_ps(&input[i + 2 * octa_samples]); \
@@ -573,6 +592,7 @@ RADIX8_P1(forward_half, 0.0f, -0.0f, -M_SQRT1_2)
 void MANGLE(mufft_radix8_generic)(void * MUFFT_RESTRICT output_, const void * MUFFT_RESTRICT input_,
         const cfloat * MUFFT_RESTRICT twiddles, unsigned p, unsigned samples)
 {
+    printf("mufft_radix8_generic \n");
     cfloat *output = output_;
     const cfloat *input = input_;
 
@@ -654,6 +674,7 @@ void MANGLE(mufft_radix8_generic)(void * MUFFT_RESTRICT output_, const void * MU
 void MANGLE(mufft_radix2_p1_vert)(void * MUFFT_RESTRICT output_, const void * MUFFT_RESTRICT input_,
         const cfloat * MUFFT_RESTRICT twiddles, unsigned p, unsigned samples_x, unsigned stride, unsigned samples_y)
 {
+    printf("mufft_radix2_p1_vert \n");
     cfloat *output = output_;
     const cfloat *input = input_;
     (void)twiddles;
@@ -682,6 +703,7 @@ void MANGLE(mufft_radix2_p1_vert)(void * MUFFT_RESTRICT output_, const void * MU
 void MANGLE(mufft_radix2_generic_vert)(void * MUFFT_RESTRICT output_, const void * MUFFT_RESTRICT input_,
         const cfloat * MUFFT_RESTRICT twiddles, unsigned p, unsigned samples_x, unsigned stride, unsigned samples_y)
 {
+    printf("mufft_radix2_generic_vert \n");
     cfloat *output = output_;
     const cfloat *input = input_;
 
@@ -715,6 +737,7 @@ void MANGLE(mufft_radix2_generic_vert)(void * MUFFT_RESTRICT output_, const void
 void MANGLE(mufft_ ## direction ## _radix4_p1_vert)(void * MUFFT_RESTRICT output_, const void * MUFFT_RESTRICT input_, \
         const cfloat * MUFFT_RESTRICT twiddles, unsigned p, unsigned samples_x, unsigned stride, unsigned samples_y) \
 { \
+    printf("mufft_ _radix4_p1_vert \n");\
     cfloat *output = output_; \
     const cfloat *input = input_; \
     (void)twiddles; \
@@ -758,6 +781,7 @@ RADIX4_P1_VERT(inverse, -0.0f, 0.0f)
 void MANGLE(mufft_radix4_generic_vert)(void * MUFFT_RESTRICT output_, const void * MUFFT_RESTRICT input_,
         const cfloat * MUFFT_RESTRICT twiddles, unsigned p, unsigned samples_x, unsigned stride, unsigned samples_y)
 {
+    printf("mufft_radix4_generic_vert \n");
     cfloat *output = output_;
     const cfloat *input = input_;
 
@@ -805,6 +829,7 @@ void MANGLE(mufft_radix4_generic_vert)(void * MUFFT_RESTRICT output_, const void
 void MANGLE(mufft_ ## direction ## _radix8_p1_vert)(void * MUFFT_RESTRICT output_, const void * MUFFT_RESTRICT input_, \
         const cfloat * MUFFT_RESTRICT twiddles, unsigned p, unsigned samples_x, unsigned stride, unsigned samples_y) \
 { \
+    printf("mufft_ _radix8_p1_vert \n");\
     cfloat *output = output_; \
     const cfloat *input = input_; \
     (void)p; \
@@ -879,6 +904,7 @@ RADIX8_P1_VERT(inverse, -0.0f, 0.0f, +M_SQRT1_2)
 void MANGLE(mufft_radix8_generic_vert)(void * MUFFT_RESTRICT output_, const void * MUFFT_RESTRICT input_,
         const cfloat * MUFFT_RESTRICT twiddles, unsigned p, unsigned samples_x, unsigned stride, unsigned samples_y)
 {
+    printf("mufft_radix8_generic_vert \n");
     cfloat *output = output_;
     const cfloat *input = input_;
 

@@ -317,6 +317,8 @@ static bool add_step(struct mufft_step_base **steps, unsigned *num_steps,
         .p = p,
         .twiddle_offset = twiddle_offset,
     };
+
+    printf("radix: %u , p: %u , twiddle_offset: %u \n", step->radix, p, twiddle_offset);
     (*num_steps)++;
     return true;
 }
@@ -361,6 +363,7 @@ static bool build_plan_1d(struct mufft_step_1d **steps, unsigned *num_steps, uns
                 // Ugly casting, but add_step_1d and add_step_2d are ABI-wise exactly the same, and we don't have templates :(
                 if (add_step((struct mufft_step_base**)steps, num_steps, (const struct fft_step_base*)step, p))
                 {
+                    printf("Step no: %u \n",i );
                     found = true;
                     radix /= step->radix;
                     p *= step->radix;
